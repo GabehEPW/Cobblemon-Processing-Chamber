@@ -34,18 +34,15 @@ class ProcessingChamberMenu : AbstractContainerMenu {
         checkContainerSize(container, CapsuleBlockEntity.CONTAINER_SIZE)
         container.startOpen(playerInventory.player)
 
-        addSlot(InputSlot(container, CapsuleBlockEntity.SLOT_INPUT, 52, 62))
+        addSlot(InputSlot(container, CapsuleBlockEntity.SLOT_INPUT, 88, 61))
 
-        for (row in 0..2) {
-            for (column in 0..2) {
-                val slot = CapsuleBlockEntity.SLOT_OUTPUT_START + column + row * 3
-                addSlot(OutputSlot(container, slot, 94 + column * 20, 41 + row * 20))
-            }
+        for ((index, position) in OUTPUT_SLOT_POSITIONS.withIndex()) {
+            addSlot(OutputSlot(container, CapsuleBlockEntity.SLOT_OUTPUT_START + index, position.first, position.second))
         }
 
         for (row in 0..2) {
             val slot = CapsuleBlockEntity.SLOT_UPGRADE_START + row
-            addSlot(UpgradeSlot(container, slot, 160, 41 + row * 20))
+            addSlot(UpgradeSlot(container, slot, 151, 34 + row * 28))
         }
 
         for (row in 0..2) {
@@ -95,7 +92,7 @@ class ProcessingChamberMenu : AbstractContainerMenu {
             if (!moveSingleUpgradeStack(stack)) {
                 return ItemStack.EMPTY
             }
-        } else if (CapsuleBlockEntity.isValidSeed(stack)) {
+        } else if (CapsuleBlockEntity.isValidInput(stack)) {
             if (!moveItemStackTo(
                     stack,
                     CapsuleBlockEntity.SLOT_INPUT,
@@ -134,7 +131,7 @@ class ProcessingChamberMenu : AbstractContainerMenu {
     }
 
     private class InputSlot(container: Container, slot: Int, x: Int, y: Int) : Slot(container, slot, x, y) {
-        override fun mayPlace(stack: ItemStack): Boolean = CapsuleBlockEntity.isValidSeed(stack)
+        override fun mayPlace(stack: ItemStack): Boolean = CapsuleBlockEntity.isValidInput(stack)
     }
 
     private class OutputSlot(container: Container, slot: Int, x: Int, y: Int) : Slot(container, slot, x, y) {
@@ -155,5 +152,18 @@ class ProcessingChamberMenu : AbstractContainerMenu {
         override fun getMaxStackSize(): Int = 1
 
         override fun getMaxStackSize(stack: ItemStack): Int = 1
+    }
+
+    companion object {
+        private val OUTPUT_SLOT_POSITIONS = arrayOf(
+            68 to 41,
+            88 to 41,
+            108 to 41,
+            68 to 61,
+            108 to 61,
+            68 to 81,
+            88 to 81,
+            108 to 81,
+        )
     }
 }

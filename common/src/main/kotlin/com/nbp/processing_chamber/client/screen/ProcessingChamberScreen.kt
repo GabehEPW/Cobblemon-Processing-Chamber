@@ -42,16 +42,21 @@ class ProcessingChamberScreen(
     override fun renderLabels(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int) {
         val titleX = ((imageWidth - font.width(title)) / 2).coerceAtLeast(0)
         guiGraphics.drawString(font, title, titleX, titleLabelY, 0xFFFFFF, true)
-        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xD7D7D7, false)
+        // The custom background already frames the player inventory, so no label is needed here.
     }
 
     private fun renderEnergy(guiGraphics: GuiGraphics, left: Int, top: Int) {
         val frame = if (menu.capacity <= 0) {
             BATTERY_FRAMES - 1
         } else {
-            val filledRatio = menu.energy.coerceIn(0, menu.capacity) / menu.capacity.toFloat()
-            val filledBars = ceil(filledRatio * (BATTERY_FRAMES - 1)).toInt()
-            (BATTERY_FRAMES - 1 - filledBars).coerceIn(0, BATTERY_FRAMES - 1)
+            val energy = menu.energy.coerceIn(0, menu.capacity)
+            when {
+                energy <= 0 -> 4
+                energy >= menu.capacity -> 0
+                energy <= menu.capacity * 0.25f -> 3
+                energy <= menu.capacity * 0.50f -> 2
+                else -> 1
+            }
         }
 
         guiGraphics.blit(
@@ -81,12 +86,12 @@ class ProcessingChamberScreen(
             PROGRESS,
             left + PROGRESS_X,
             top + PROGRESS_Y,
-            (frame * PROGRESS_WIDTH).toFloat(),
             0F,
+            (frame * PROGRESS_HEIGHT).toFloat(),
             PROGRESS_WIDTH,
             PROGRESS_HEIGHT,
-            PROGRESS_WIDTH * PROGRESS_FRAMES,
-            PROGRESS_HEIGHT,
+            PROGRESS_WIDTH,
+            PROGRESS_HEIGHT * PROGRESS_FRAMES,
         )
     }
 
@@ -100,8 +105,8 @@ class ProcessingChamberScreen(
             guiGraphics.renderComponentTooltip(
                 font,
                 listOf(
-                    Component.literal("${menu.energy} / ${menu.capacity} FE"),
-                    Component.literal("${menu.energyPerTick} FE/t"),
+                    Component.literal("${menu.energy} / ${menu.capacity} FE/RF"),
+                    Component.literal("${menu.energyPerTick} FE/RF/t"),
                 ),
                 mouseX,
                 mouseY,
@@ -109,15 +114,13 @@ class ProcessingChamberScreen(
             return
         }
 
-        if (localX in PROGRESS_X until PROGRESS_X + PROGRESS_WIDTH &&
-            localY in PROGRESS_Y until PROGRESS_Y + PROGRESS_HEIGHT
-        ) {
+        if (isProgressFrameHovered(localX, localY)) {
             val visibleProgress = menu.progress.coerceIn(0, menu.processTime)
             guiGraphics.renderComponentTooltip(
                 font,
                 listOf(
                     Component.literal("$visibleProgress / ${menu.processTime}"),
-                    Component.literal("${menu.energyPerTick} FE/t"),
+                    Component.literal("${menu.energyPerTick} FE/RF/t"),
                     Component.literal("Fortune: ${menu.fortuneChancePercent}%"),
                 ),
                 mouseX,
@@ -126,21 +129,37 @@ class ProcessingChamberScreen(
         }
     }
 
+    private fun isProgressFrameHovered(localX: Int, localY: Int): Boolean {
+        if (localX !in PROGRESS_X until PROGRESS_X + PROGRESS_WIDTH ||
+            localY !in PROGRESS_Y until PROGRESS_Y + PROGRESS_HEIGHT
+        ) {
+            return false
+        }
+
+        val frameX = localX - PROGRESS_X
+        val frameY = localY - PROGRESS_Y
+        return frameX < PROGRESS_TOOLTIP_BORDER ||
+            frameX >= PROGRESS_WIDTH - PROGRESS_TOOLTIP_BORDER ||
+            frameY < PROGRESS_TOOLTIP_BORDER ||
+            frameY >= PROGRESS_HEIGHT - PROGRESS_TOOLTIP_BORDER
+    }
+
     companion object {
         private const val WIDTH = 192
         private const val HEIGHT = 198
 
-        private const val BATTERY_X = 20
-        private const val BATTERY_Y = 26
+        private const val BATTERY_X = 18
+        private const val BATTERY_Y = 55
         private const val BATTERY_WIDTH = 19
-        private const val BATTERY_HEIGHT = 74
-        private const val BATTERY_FRAMES = 10
+        private const val BATTERY_HEIGHT = 29
+        private const val BATTERY_FRAMES = 5
 
-        private const val PROGRESS_X = 71
-        private const val PROGRESS_Y = 67
-        private const val PROGRESS_WIDTH = 20
-        private const val PROGRESS_HEIGHT = 8
-        private const val PROGRESS_FRAMES = 7
+        private const val PROGRESS_X = 59
+        private const val PROGRESS_Y = 32
+        private const val PROGRESS_WIDTH = 74
+        private const val PROGRESS_HEIGHT = 74
+        private const val PROGRESS_FRAMES = 85
+        private const val PROGRESS_TOOLTIP_BORDER = 8
 
         private fun resource(path: String): ResourceLocation =
             ResourceLocation.fromNamespaceAndPath(ProcessingChamber.MOD_ID, path)

@@ -2,15 +2,15 @@
 
 # Processing Chamber
 
-**Processing Chamber** is a **Cobblemon addon** that adds FE-powered machines for automating the production of **Apricorns**, **Berries**, and **Mint Leaves**.
+**Processing Chamber** is a **Cobblemon addon** that adds FE/RF-powered machines for automating the production of **Apricorns**, **Berries**, **Mint Leaves**, seed-grown Minecraft crops, and Cobblemon plants.
 
-Build compact processing setups, power your machines with FE, install upgrade cards, and automate resource production using hoppers, item pipes, and energy networks.
+Build compact processing setups, power your machines with FE/RF, install upgrade cards, and automate resource production using hoppers, item pipes, and energy networks.
 
 ---
 
 ## ✨ Features
 
-* FE-powered processing machines
+* FE/RF-powered processing machines
 * Apricorn Seed automation
 * Berry multiplication
 * Mint Leaf production
@@ -20,7 +20,6 @@ Build compact processing setups, power your machines with FE, install upgrade ca
 * Energy and progress display
 * Hopper and pipe automation support
 * Configurable machine values
-* English and Brazilian Portuguese translations
 
 ---
 
@@ -28,8 +27,8 @@ Build compact processing setups, power your machines with FE, install upgrade ca
 
 | Block                           | Description                                                                                                                                              |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Resource Processor**          | Basic machine for processing Cobblemon resources. Stores **5,000 FE**, consumes **15 FE/t**, and accepts **1 upgrade card**.                             |
-| **Advanced Resource Processor** | Advanced machine with higher energy capacity, faster processing, and up to **3 different upgrade cards**. Stores **10,000 FE** and consumes **45 FE/t**. |
+| **Resource Chamber**          | Basic machine for processing Cobblemon resources. Stores **5,000 FE/RF**, consumes **15 FE/RF/t**, and accepts **1 upgrade card**.                             |
+| **Advanced Resource Chamber** | Advanced machine with higher energy capacity, faster processing, and up to **3 different upgrade cards**. Stores **10,000 FE/RF** and consumes **45 FE/RF/t**. |
 
 ---
 
@@ -37,21 +36,21 @@ Build compact processing setups, power your machines with FE, install upgrade ca
 
 | Item                      | Description                                                                                                               |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **Processor Upgrade Kit** | Upgrades a Resource Processor into an Advanced Resource Processor while preserving energy, progress, items, and upgrades. |
-| **Overclock Card**        | Reduces processing time, but increases FE usage.                                                                          |
-| **Optimized Card**        | Reduces FE consumption without changing processing time.                                                                  |
-| **Fortune Card**          | Adds a chance to generate bonus output, but increases FE usage.                                                           |
+| **Processor Upgrade Kit** | Upgrades a Resource Chamber into an Advanced Resource Chamber while preserving energy, progress, items, and upgrades. |
+| **Overclock Card**        | Reduces processing time, but increases FE/RF usage.                                                                       |
+| **Optimized Card**        | Reduces FE/RF consumption without changing processing time.                                                                  |
+| **Fortune Card**          | Adds a chance to generate bonus output, but increases FE/RF usage.                                                        |
 
 ---
 
 ## ⚙️ How It Works
 
-1. Place a **Resource Processor** or **Advanced Resource Processor** in the world.
-2. Supply FE energy through the **back face** of the machine.
-3. Insert a valid Cobblemon item into the input slot.
+1. Place a **Resource Chamber** or **Advanced Resource Chamber** in the world.
+2. Supply FE/RF energy through the **back face** of the machine.
+3. Insert a valid item into the input slot.
 4. The machine processes automatically while it has energy and output space.
-5. Generated items are stored in the **9 output slots**.
-6. Outputs can be collected manually or extracted through automation.
+5. Generated items are stored in the **8 output slots** around the input slot.
+6. Outputs can be collected manually, extracted through automation, or pushed into an inventory below.
 
 The input item is **not consumed every cycle**.
 
@@ -67,7 +66,7 @@ If the machine runs out of energy, the processing progress is paused instead of 
 
 ## ⬆️ Processor Upgrade Kit
 
-The **Processor Upgrade Kit** instantly converts a **Resource Processor** into an **Advanced Resource Processor**.
+The **Processor Upgrade Kit** instantly converts a **Resource Chamber** into an **Advanced Resource Chamber**.
 
 The upgrade preserves:
 
@@ -85,8 +84,8 @@ Upgrade cards can only be inserted into upgrade slots.
 
 ### Upgrade Rules
 
-* **Resource Processor** accepts **1 upgrade card**
-* **Advanced Resource Processor** accepts up to **3 different upgrade cards**
+* **Resource Chamber** accepts **1 upgrade card**
+* **Advanced Resource Chamber** accepts up to **3 different upgrade cards**
 * Duplicate upgrade cards are not allowed in the same machine
 * Each upgrade slot holds only **1 card**
 
@@ -99,7 +98,7 @@ Increases machine speed.
 **Effects:**
 
 * Reduces processing time by **20%**
-* Increases FE consumption by **40%**
+* Increases FE/RF consumption by **40%**
 
 ---
 
@@ -109,7 +108,7 @@ Improves energy efficiency.
 
 **Effects:**
 
-* Reduces FE consumption by **30%**
+* Reduces FE/RF consumption by **30%**
 * Does not change processing time
 
 ---
@@ -120,9 +119,9 @@ Adds a chance to generate bonus output.
 
 **Effects:**
 
-* **+15%** bonus output chance in the Resource Processor
-* **+25%** bonus output chance in the Advanced Resource Processor
-* Increases FE consumption by **20%**
+* **+15%** bonus output chance in the Resource Chamber
+* **+25%** bonus output chance in the Advanced Resource Chamber
+* Increases FE/RF consumption by **20%**
 
 ---
 
@@ -169,16 +168,50 @@ Example:
 
 ---
 
+### Minecraft Seeds and Crops → Mature Crop
+
+Processed foods are not accepted directly. Only crop seeds or crop items that act as their own seed can be processed.
+
+Examples:
+
+| Input          | Output       |
+| -------------- | ------------ |
+| Wheat Seeds    | Wheat        |
+| Beetroot Seeds | Beetroot     |
+| Melon Seeds    | Melon Slice  |
+| Pumpkin Seeds  | Pumpkin      |
+| Pumpkin        | Pumpkin      |
+| Apple          | Apple        |
+| Carrot         | Carrot       |
+| Potato         | Potato       |
+
+---
+
+### Cobblemon Plants → Same Plant
+
+Items in `#cobblemon:plants` can be processed into the same item type, including medicinal leek, herbs, and roots.
+
+Examples:
+
+| Input          | Output         |
+| -------------- | -------------- |
+| Medicinal Leek | Medicinal Leek |
+| Big Root       | Big Root       |
+| Energy Root    | Energy Root    |
+| Revival Herb   | Revival Herb   |
+
+---
+
 ## ⚡ Energy
 
-Processing Chamber machines use **FE energy**.
+Processing Chamber machines use **FE/RF energy**.
 
-| Parameter            | Resource Processor | Advanced Resource Processor |
+| Parameter            | Resource Chamber | Advanced Resource Chamber |
 | -------------------- | -----------------: | --------------------------: |
-| Energy storage       |           5,000 FE |                   10,000 FE |
-| Base FE consumption  |            15 FE/t |                     45 FE/t |
+| Energy storage       |           5,000 FE/RF |                   10,000 FE/RF |
+| Base FE/RF consumption  |            15 FE/RF/t |                     45 FE/RF/t |
 | Base processing time |  1,800 ticks / 90s |             900 ticks / 45s |
-| Output slots         |                  9 |                           9 |
+| Output slots         |                  8 |                           8 |
 | Upgrade slots        |                  1 |                           3 |
 
 Energy is inserted through the **back face** of the machine.
@@ -189,7 +222,7 @@ Stored energy is preserved when the machine is broken and placed again.
 
 ## 🔨 Crafting Recipes
 
-### Resource Processor
+### Resource Chamber
 
 ```txt
 I I I
@@ -205,7 +238,7 @@ R: Redstone
 
 ---
 
-### Advanced Resource Processor
+### Advanced Resource Chamber
 
 ```txt
 O R O
@@ -217,7 +250,7 @@ O R O
 O: Obsidian
 R: Redstone
 Q: Quartz
-P: Resource Processor
+P: Resource Chamber
 ```
 
 ---
@@ -297,9 +330,9 @@ Processing Chamber machines support automation with hoppers, item pipes, and ene
 | ------ | ------------------------------- |
 | Top    | Inserts valid input items       |
 | Bottom | Extracts generated output items |
-| Back   | Accepts FE energy               |
+| Back   | Accepts FE/RF energy               |
 
-Machines can also transfer outputs downward into another processor placed below them.
+Machines can also transfer outputs downward into another chamber or a vanilla inventory placed below them, such as a chest or barrel.
 
 This allows players to build compact vertical processing arrays.
 
@@ -321,7 +354,7 @@ Tooltips may display:
 
 * Stored energy
 * Processing progress
-* FE/t usage
+* FE/RF/t usage
 * Fortune bonus chance
 * Installed upgrade effects
 
@@ -338,14 +371,16 @@ config/processing_chamber.json
 Server owners and players can configure:
 
 * Max energy storage
-* FE consumption per tick
+* FE/RF consumption per tick
 * Processing time
 * Output amount
 * Upgrade slot count
 * Minimum processing time
 * Fortune bonus chance
 * Upgrade card multipliers
-* Minimum FE/t usage
+* Minimum FE/RF/t usage
+* Tag-based processing rules
+* Custom input/output processing rules
 
 Example configuration:
 
@@ -375,20 +410,47 @@ Example configuration:
     "optimization_energy_multiplier": 0.7,
     "fortune_energy_multiplier": 1.2,
     "min_energy_per_tick": 5
+  },
+  "tag_processing": {
+    "#cobblemon:plants": "same",
+    "#cobblemon:berries": "same",
+    "#cobblemon:apricorns": "same"
+  },
+  "custom_processing": {
+    "cobblemon:vivichoke_seeds": "cobblemon:vivichoke",
+    "minecraft:beetroot_seeds": "minecraft:beetroot"
   }
 }
 ```
 
----
+### Tag Processing
 
-## 🌐 Languages
+`tag_processing` lets servers process every item inside an item tag.
 
-Processing Chamber currently supports:
+Use `"same"` to output the same item that was inserted, or use an item ID to make every item in that tag output a specific item.
 
-* English
-* Português do Brasil
+Example:
 
----
+```json
+{
+  "#cobblemon:berries": "same",
+  "#cobblemon:apricorns": "minecraft:bone_meal"
+}
+```
+
+### Custom Processing
+
+`custom_processing` lets servers add any input/output pair without updating the mod.
+
+Example:
+
+```json
+{
+  "cobblemon:vivichoke_seeds": "cobblemon:vivichoke",
+  "some_mod:custom_seed": "some_mod:custom_crop",
+  "some_mod:duplicate_me": "same"
+}
+```
 
 ## 📦 Dependencies
 

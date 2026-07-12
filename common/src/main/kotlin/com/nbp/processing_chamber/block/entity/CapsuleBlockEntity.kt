@@ -10,10 +10,13 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.world.Container
 import net.minecraft.world.ContainerHelper
 import net.minecraft.world.WorldlyContainer
 import net.minecraft.server.level.ServerPlayer
@@ -24,7 +27,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerData
 import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
@@ -48,11 +53,11 @@ class CapsuleBlockEntity(
     companion object {
         const val SLOT_INPUT = 0
         const val SLOT_OUTPUT_START = 1
-        const val SLOT_OUTPUT_END = 9
-        const val SLOT_UPGRADE_START = 10
-        const val SLOT_UPGRADE_END = 12
+        const val SLOT_OUTPUT_END = 8
+        const val SLOT_UPGRADE_START = 9
+        const val SLOT_UPGRADE_END = 11
         const val MAX_UPGRADE_SLOTS = 3
-        const val CONTAINER_SIZE = 13
+        const val CONTAINER_SIZE = 12
 
         const val DATA_ENERGY = 0
         const val DATA_CAPACITY = 1
@@ -153,11 +158,52 @@ class CapsuleBlockEntity(
             put("cobblemon:pink_mint_seeds", "cobblemon:pink_mint_leaf")
             put("cobblemon:white_mint_seeds", "cobblemon:white_mint_leaf")
             put("cobblemon:cyan_mint_seeds", "cobblemon:cyan_mint_leaf")
+
+            put("cobblemon:vivichoke_seeds", "cobblemon:vivichoke")
+            put("cobblemon:hearty_grains", "cobblemon:hearty_grains")
         }
 
-        fun isValidSeed(stack: ItemStack): Boolean {
+        private val VANILLA_CROP_MAP = mapOf(
+            "minecraft:wheat_seeds" to "minecraft:wheat",
+            "minecraft:beetroot_seeds" to "minecraft:beetroot",
+            "minecraft:melon_seeds" to "minecraft:melon_slice",
+            "minecraft:pumpkin_seeds" to "minecraft:pumpkin",
+            "minecraft:pumpkin" to "minecraft:pumpkin",
+            "minecraft:torchflower_seeds" to "minecraft:torchflower",
+            "minecraft:pitcher_pod" to "minecraft:pitcher_plant",
+            "minecraft:apple" to "minecraft:apple",
+            "minecraft:carrot" to "minecraft:carrot",
+            "minecraft:potato" to "minecraft:potato",
+            "minecraft:sweet_berries" to "minecraft:sweet_berries",
+            "minecraft:glow_berries" to "minecraft:glow_berries",
+            "minecraft:cocoa_beans" to "minecraft:cocoa_beans",
+            "minecraft:nether_wart" to "minecraft:nether_wart",
+        )
+
+        private val CROP_MAPS = listOf(ITEM_MAP, VANILLA_CROP_MAP)
+        private val ALL_MAPPED_INPUTS = CROP_MAPS.flatMap { it.keys }.toSet()
+        private val ALL_MAPPED_OUTPUTS = CROP_MAPS.flatMap { it.values }.toSet()
+        private val SELF_DUPLICATING_INPUTS = ALL_MAPPED_INPUTS.intersect(ALL_MAPPED_OUTPUTS)
+
+        fun isValidInput(stack: ItemStack): Boolean {
             val id = BuiltInRegistries.ITEM.getKey(stack.item)?.toString() ?: return false
-            return id in ITEM_MAP
+            if (id in ProcessingChamberConfig.customProcessing) return true
+            if (id in ALL_MAPPED_OUTPUTS && id !in SELF_DUPLICATING_INPUTS) return false
+            return id in ALL_MAPPED_INPUTS || shouldDuplicateInput(stack)
+        }
+
+        private fun shouldDuplicateInput(stack: ItemStack): Boolean =
+            getConfiguredTagResult(stack) != null
+
+        private fun getConfiguredTagResult(stack: ItemStack): String? {
+            val inputId = BuiltInRegistries.ITEM.getKey(stack.item)?.toString() ?: return null
+            for ((rawTagId, rawResultId) in ProcessingChamberConfig.tagProcessing) {
+                val tagId = ResourceLocation.tryParse(rawTagId.removePrefix("#")) ?: continue
+                val tag = TagKey.create(Registries.ITEM, tagId)
+                if (!stack.`is`(tag)) continue
+                return if (rawResultId.equals("same", ignoreCase = true)) inputId else rawResultId
+            }
+            return null
         }
 
         fun isValidUpgrade(stack: ItemStack): Boolean {
@@ -393,14 +439,48 @@ class CapsuleBlockEntity(
 
     private fun getResult(input: ItemStack): ItemStack {
         val inputId = BuiltInRegistries.ITEM.getKey(input.item)?.toString() ?: ""
-        val resultId = ITEM_MAP[inputId] ?: return ItemStack.EMPTY
-        val item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(resultId))
-        if (item == BuiltInRegistries.ITEM.get(ResourceLocation.tryParse("minecraft:air"))) return ItemStack.EMPTY
-        return ItemStack(item, outputAmount)
+        val resultId = ProcessingChamberConfig.customProcessing[inputId]?.let { configuredResultId(it, inputId) }
+            ?: CROP_MAPS.firstNotNullOfOrNull { it[inputId] }
+            ?: getConfiguredTagResult(input)
+        if (resultId != null) return createResultStack(resultId)
+
+        if (inputId in ALL_MAPPED_OUTPUTS && inputId !in SELF_DUPLICATING_INPUTS) return ItemStack.EMPTY
+        return ItemStack.EMPTY
     }
 
+    private fun createResultStack(resultId: String): ItemStack {
+        val resultLocation = ResourceLocation.tryParse(resultId) ?: return ItemStack.EMPTY
+        val item = BuiltInRegistries.ITEM.get(resultLocation)
+        if (item == Items.AIR) return ItemStack.EMPTY
+        val result = ItemStack(item)
+        result.count = outputAmount.coerceAtLeast(1).coerceAtMost(result.maxStackSize)
+        return result
+    }
+
+    private fun configuredResultId(rawResultId: String, inputId: String): String =
+        if (rawResultId.equals("same", ignoreCase = true)) inputId else rawResultId
+
     private fun transferOutputsDown(): Boolean {
-        val target = level?.getBlockEntity(worldPosition.below()) as? CapsuleBlockEntity ?: return false
+        val targetEntity = level?.getBlockEntity(worldPosition.below()) ?: return false
+        val movedAny = when (targetEntity) {
+            is CapsuleBlockEntity -> transferOutputsToCapsule(targetEntity)
+            is Container -> transferOutputsToContainer(targetEntity, Direction.UP)
+            else -> false
+        }
+
+        if (movedAny) {
+            setChanged()
+            targetEntity.setChanged()
+            syncToClient()
+            if (targetEntity is CapsuleBlockEntity) {
+                targetEntity.syncToClient()
+            }
+        }
+
+        return movedAny
+    }
+
+    private fun transferOutputsToCapsule(target: CapsuleBlockEntity): Boolean {
         var movedAny = false
 
         for (slot in SLOT_OUTPUT_START..SLOT_OUTPUT_END) {
@@ -415,14 +495,77 @@ class CapsuleBlockEntity(
             }
         }
 
+        return movedAny
+    }
+
+    private fun transferOutputsToContainer(target: Container, side: Direction): Boolean {
+        var movedAny = false
+
+        for (slot in SLOT_OUTPUT_START..SLOT_OUTPUT_END) {
+            val source = items[slot]
+            if (source.isEmpty) continue
+
+            if (insertIntoContainer(source, target, side) > 0) {
+                movedAny = true
+                if (source.isEmpty) {
+                    items[slot] = ItemStack.EMPTY
+                }
+            }
+        }
+
         if (movedAny) {
-            setChanged()
             target.setChanged()
-            syncToClient()
-            target.syncToClient()
         }
 
         return movedAny
+    }
+
+    private fun insertIntoContainer(source: ItemStack, target: Container, side: Direction): Int {
+        var moved = 0
+        val slots = getTargetSlots(target, side)
+
+        for (slot in slots) {
+            val destination = target.getItem(slot)
+            if (destination.isEmpty || !ItemStack.isSameItemSameComponents(destination, source)) continue
+            if (!canInsertIntoTarget(target, slot, source, side)) continue
+
+            val amount = minOf(source.count, destination.maxStackSize - destination.count, target.maxStackSize - destination.count)
+            if (amount <= 0) continue
+
+            destination.grow(amount)
+            source.shrink(amount)
+            moved += amount
+            if (source.isEmpty) return moved
+        }
+
+        for (slot in slots) {
+            if (!target.getItem(slot).isEmpty) continue
+            if (!canInsertIntoTarget(target, slot, source, side)) continue
+
+            val amount = minOf(source.count, source.maxStackSize, target.maxStackSize)
+            if (amount <= 0) continue
+
+            val inserted = source.copy()
+            inserted.count = amount
+            target.setItem(slot, inserted)
+            source.shrink(amount)
+            moved += amount
+            if (source.isEmpty) return moved
+        }
+
+        return moved
+    }
+
+    private fun getTargetSlots(target: Container, side: Direction): IntArray =
+        if (target is WorldlyContainer) {
+            target.getSlotsForFace(side)
+        } else {
+            IntArray(target.containerSize) { it }
+        }
+
+    private fun canInsertIntoTarget(target: Container, slot: Int, stack: ItemStack, side: Direction): Boolean {
+        if (!target.canPlaceItem(slot, stack)) return false
+        return target !is WorldlyContainer || target.canPlaceItemThroughFace(slot, stack, side)
     }
 
     private fun acceptOutput(source: ItemStack): Int {
@@ -502,20 +645,20 @@ class CapsuleBlockEntity(
             worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5
         ) <= 64.0
     override fun clearContent() = items.fill(ItemStack.EMPTY)
-    override fun getSlotsForFace(side: Direction?): IntArray {
+    override fun getSlotsForFace(side: Direction): IntArray {
         return if (side == Direction.DOWN) OUTPUT_SLOTS else intArrayOf(SLOT_INPUT)
     }
 
     override fun canPlaceItemThroughFace(slot: Int, stack: ItemStack, side: Direction?): Boolean {
         if (slot != SLOT_INPUT || side != Direction.UP) return false
         if (!getItem(0).isEmpty) return false
-        if (!isValidSeed(stack)) return false
+        if (!isValidInput(stack)) return false
         val result = getResult(stack)
         if (result.isEmpty) return false
         return findOutputSlot(result) != -1
     }
 
-    override fun canTakeItemThroughFace(slot: Int, stack: ItemStack, side: Direction?): Boolean =
+    override fun canTakeItemThroughFace(slot: Int, stack: ItemStack, side: Direction): Boolean =
         slot in SLOT_OUTPUT_START..SLOT_OUTPUT_END && side == Direction.DOWN
 
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {

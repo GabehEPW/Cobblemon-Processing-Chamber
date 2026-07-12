@@ -5,7 +5,7 @@ license = "MIT"
 [[mods]]
 modId = "processing_chamber"
 version = "${version}"
-displayName = "Resource Processor"
+displayName = "Processing Chamber"
 authors = "GabehEPW"
 description = '''
 Addon para Cobblemon usando Kotlin, Fabric, NeoForge e Architectury.

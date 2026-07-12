@@ -140,7 +140,7 @@ class ProcessingChamberBlock(properties: Properties) : BaseEntityBlock(propertie
     ): ItemInteractionResult {
         val be = level.getBlockEntity(pos) as? CapsuleBlockEntity ?: return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         if (!be.getItem(0).isEmpty) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
-        if (!CapsuleBlockEntity.isValidSeed(stack)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        if (!CapsuleBlockEntity.isValidInput(stack)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         if (level.isClientSide) return ItemInteractionResult.SUCCESS
         be.setItem(0, stack.copyWithCount(1))
         if (!player.abilities.instabuild) stack.shrink(1)

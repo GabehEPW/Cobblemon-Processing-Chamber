@@ -33,6 +33,10 @@ object ProcessingChamberConfig {
         private set
     var upgrades: UpgradeConfig = UpgradeConfig()
         private set
+    var customProcessing: Map<String, String> = defaultCustomProcessing()
+        private set
+    var tagProcessing: Map<String, String> = defaultTagProcessing()
+        private set
 
     private val DEFAULT_JSON = """{
   "normal": {
@@ -59,6 +63,15 @@ object ProcessingChamberConfig {
     "optimization_energy_multiplier": 0.7,
     "fortune_energy_multiplier": 1.2,
     "min_energy_per_tick": 5
+  },
+  "tag_processing": {
+    "#cobblemon:plants": "same",
+    "#cobblemon:berries": "same",
+    "#cobblemon:apricorns": "same"
+  },
+  "custom_processing": {
+    "cobblemon:vivichoke_seeds": "cobblemon:vivichoke",
+    "minecraft:beetroot_seeds": "minecraft:beetroot"
   }
 }"""
 
@@ -68,9 +81,13 @@ object ProcessingChamberConfig {
         val normalDefaults = TierConfig()
         val advancedDefaults = TierConfig(10000, 45, 900, 1, 3, 600, 0.25f)
         val upgradeDefaults = UpgradeConfig()
+        val customDefaults = defaultCustomProcessing()
+        val tagDefaults = defaultTagProcessing()
         normal = normalDefaults
         advanced = advancedDefaults
         upgrades = upgradeDefaults
+        customProcessing = customDefaults
+        tagProcessing = tagDefaults
 
         if (Files.exists(file)) {
             try {
@@ -85,6 +102,12 @@ object ProcessingChamberConfig {
                 }
                 if (json.has("upgrades")) {
                     upgrades = readUpgrades(json.getAsJsonObject("upgrades"), upgradeDefaults)
+                }
+                if (json.has("tag_processing")) {
+                    tagProcessing = readStringMap(json.getAsJsonObject("tag_processing"))
+                }
+                if (json.has("custom_processing")) {
+                    customProcessing = readStringMap(json.getAsJsonObject("custom_processing"))
                 }
                 writeCurrentConfig(file)
             } catch (_: Exception) { }
@@ -126,6 +149,15 @@ object ProcessingChamberConfig {
     private fun readFloat(json: JsonObject, key: String, legacyKey: String): Float? =
         json.get(key)?.asFloat ?: json.get(legacyKey)?.asFloat
 
+    private fun readStringMap(json: JsonObject): Map<String, String> {
+        val values = linkedMapOf<String, String>()
+        for ((key, value) in json.entrySet()) {
+            if (!value.isJsonPrimitive || !value.asJsonPrimitive.isString) continue
+            values[key] = value.asString
+        }
+        return values
+    }
+
     private fun writeCurrentConfig(file: Path) {
         val root = JsonObject()
         root.add("normal", writeTier(normal))
@@ -137,6 +169,8 @@ object ProcessingChamberConfig {
             addProperty("fortune_energy_multiplier", upgrades.fortuneEnergyMultiplier)
             addProperty("min_energy_per_tick", upgrades.minEnergyPerTick)
         })
+        root.add("tag_processing", writeStringMap(tagProcessing))
+        root.add("custom_processing", writeStringMap(customProcessing))
         Files.writeString(file, GsonBuilder().setPrettyPrinting().create().toJson(root))
     }
 
@@ -150,4 +184,22 @@ object ProcessingChamberConfig {
             addProperty("min_process_time", tier.minProcessTime)
             addProperty("fortune_bonus_chance", tier.fortuneBonusChance)
         }
+
+    private fun writeStringMap(values: Map<String, String>): JsonObject =
+        JsonObject().apply {
+            for ((key, value) in values) {
+                addProperty(key, value)
+            }
+        }
+
+    private fun defaultTagProcessing(): Map<String, String> = linkedMapOf(
+        "#cobblemon:plants" to "same",
+        "#cobblemon:berries" to "same",
+        "#cobblemon:apricorns" to "same",
+    )
+
+    private fun defaultCustomProcessing(): Map<String, String> = linkedMapOf(
+        "cobblemon:vivichoke_seeds" to "cobblemon:vivichoke",
+        "minecraft:beetroot_seeds" to "minecraft:beetroot",
+    )
 }
