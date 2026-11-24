@@ -69,7 +69,7 @@ class CapsuleBlockEntity(
         private const val STACK_ENERGY_KEY = "processing_chamber_energy"
 
         private val ITEM_MAP = buildMap<String, String> {
-            // Apricorn seeds → apricorns
+            // Apricorn seeds & sprouts → apricorns
             put("cobblemon:black_apricorn_seed", "cobblemon:black_apricorn")
             put("cobblemon:blue_apricorn_seed", "cobblemon:blue_apricorn")
             put("cobblemon:green_apricorn_seed", "cobblemon:green_apricorn")
@@ -77,6 +77,14 @@ class CapsuleBlockEntity(
             put("cobblemon:red_apricorn_seed", "cobblemon:red_apricorn")
             put("cobblemon:white_apricorn_seed", "cobblemon:white_apricorn")
             put("cobblemon:yellow_apricorn_seed", "cobblemon:yellow_apricorn")
+
+            put("cobblemon:black_apricorn_sprout", "cobblemon:black_apricorn")
+            put("cobblemon:blue_apricorn_sprout", "cobblemon:blue_apricorn")
+            put("cobblemon:green_apricorn_sprout", "cobblemon:green_apricorn")
+            put("cobblemon:pink_apricorn_sprout", "cobblemon:pink_apricorn")
+            put("cobblemon:red_apricorn_sprout", "cobblemon:red_apricorn")
+            put("cobblemon:white_apricorn_sprout", "cobblemon:white_apricorn")
+            put("cobblemon:yellow_apricorn_sprout", "cobblemon:yellow_apricorn")
 
             // Berries → same berry
             put("cobblemon:aguav_berry", "cobblemon:aguav_berry")
@@ -151,16 +159,30 @@ class CapsuleBlockEntity(
             put("cobblemon:wiki_berry", "cobblemon:wiki_berry")
             put("cobblemon:yache_berry", "cobblemon:yache_berry")
 
-            // Mint seeds → mint leaves (note: plural "seeds")
+            // Mint seeds → mint leaves (both plural and singular)
             put("cobblemon:red_mint_seeds", "cobblemon:red_mint_leaf")
             put("cobblemon:blue_mint_seeds", "cobblemon:blue_mint_leaf")
             put("cobblemon:green_mint_seeds", "cobblemon:green_mint_leaf")
             put("cobblemon:pink_mint_seeds", "cobblemon:pink_mint_leaf")
             put("cobblemon:white_mint_seeds", "cobblemon:white_mint_leaf")
             put("cobblemon:cyan_mint_seeds", "cobblemon:cyan_mint_leaf")
+            put("cobblemon:red_mint_seed", "cobblemon:red_mint_leaf")
+            put("cobblemon:blue_mint_seed", "cobblemon:blue_mint_leaf")
+            put("cobblemon:green_mint_seed", "cobblemon:green_mint_leaf")
+            put("cobblemon:pink_mint_seed", "cobblemon:pink_mint_leaf")
+            put("cobblemon:white_mint_seed", "cobblemon:white_mint_leaf")
+            put("cobblemon:cyan_mint_seed", "cobblemon:cyan_mint_leaf")
 
+            // Cobblemon crops & plants
             put("cobblemon:vivichoke_seeds", "cobblemon:vivichoke")
+            put("cobblemon:vivichoke_seed", "cobblemon:vivichoke")
             put("cobblemon:hearty_grains", "cobblemon:hearty_grains")
+            put("cobblemon:medicinal_leek", "cobblemon:medicinal_leek")
+            put("cobblemon:big_root", "cobblemon:big_root")
+            put("cobblemon:energy_root", "cobblemon:energy_root")
+            put("cobblemon:revival_herb", "cobblemon:revival_herb")
+            put("cobblemon:pep_up_flower", "cobblemon:pep_up_flower")
+            put("cobblemon:galarica_nut", "cobblemon:galarica_nut")
         }
 
         private val VANILLA_CROP_MAP = mapOf(

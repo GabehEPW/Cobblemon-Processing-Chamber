@@ -16,7 +16,7 @@
   "tooltip.processing_chamber.optimization_card.description": "Reduces machine energy consumption.",
   "tooltip.processing_chamber.optimization_card.effect_1": "-30% FE/RF consumption",
   "tooltip.processing_chamber.optimization_card.effect_2": "Processing time unchanged",
-  "tooltip.processing_chamber.fortune_card.description": "Adds a chance to generate one extra Apricorn at the end of processing.",
+  "tooltip.processing_chamber.fortune_card.description": "Adds a chance to generate extra output at the end of processing.",
   "tooltip.processing_chamber.fortune_card.effect_1": "+15% chance in Resource Processor",
   "tooltip.processing_chamber.fortune_card.effect_2": "+25% chance in Advanced Resource Processor",
   "tooltip.processing_chamber.fortune_card.effect_3": "+20% FE/RF consumption",

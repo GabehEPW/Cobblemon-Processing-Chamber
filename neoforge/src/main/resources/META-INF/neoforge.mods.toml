@@ -8,7 +8,7 @@ version = "${version}"
 displayName = "Processing Chamber"
 authors = "GabehEPW"
 description = '''
-Addon para Cobblemon usando Kotlin, Fabric, NeoForge e Architectury.
+A Cobblemon addon adding FE/RF-powered processing chambers for automated resource production.
 '''
 
 [[dependencies.processing_chamber]]

@@ -3,7 +3,7 @@
   "id": "processing_chamber",
   "version": "${version}",
   "name": "Processing Chamber",
-  "description": "Addon para Cobblemon usando Kotlin e Architectury.",
+  "description": "A Cobblemon addon adding FE/RF-powered processing chambers for automated resource production.",
   "authors": ["GabehEPW"],
   "environment": "*",
   "entrypoints": {
