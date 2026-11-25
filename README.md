@@ -127,17 +127,19 @@ Adds a chance to generate bonus output.
 
 ## 📋 Supported Processing
 
-### Apricorn Seeds → Apricorns
+### Apricorn Seeds & Sprouts → Apricorns
 
-| Input                | Output          |
-| -------------------- | --------------- |
-| Black Apricorn Seed  | Black Apricorn  |
-| Blue Apricorn Seed   | Blue Apricorn   |
-| Green Apricorn Seed  | Green Apricorn  |
-| Pink Apricorn Seed   | Pink Apricorn   |
-| Red Apricorn Seed    | Red Apricorn    |
-| White Apricorn Seed  | White Apricorn  |
-| Yellow Apricorn Seed | Yellow Apricorn |
+Supports both legacy Apricorn Seeds and Cobblemon 1.8+ Apricorn Sprouts.
+
+| Input                                            | Output          |
+| ------------------------------------------------ | --------------- |
+| Black Apricorn Seed / Black Apricorn Sprout     | Black Apricorn  |
+| Blue Apricorn Seed / Blue Apricorn Sprout       | Blue Apricorn   |
+| Green Apricorn Seed / Green Apricorn Sprout     | Green Apricorn  |
+| Pink Apricorn Seed / Pink Apricorn Sprout       | Pink Apricorn   |
+| Red Apricorn Seed / Red Apricorn Sprout         | Red Apricorn    |
+| White Apricorn Seed / White Apricorn Sprout     | White Apricorn  |
+| Yellow Apricorn Seed / Yellow Apricorn Sprout   | Yellow Apricorn |
 
 ---
 
@@ -157,14 +159,16 @@ Example:
 
 ### Mint Seeds → Mint Leaves
 
-| Input            | Output          |
-| ---------------- | --------------- |
-| Red Mint Seeds   | Red Mint Leaf   |
-| Blue Mint Seeds  | Blue Mint Leaf  |
-| Green Mint Seeds | Green Mint Leaf |
-| Pink Mint Seeds  | Pink Mint Leaf  |
-| White Mint Seeds | White Mint Leaf |
-| Cyan Mint Seeds  | Cyan Mint Leaf  |
+Supports both plural (`*_mint_seeds`) and singular (`*_mint_seed`) variants.
+
+| Input                                   | Output          |
+| --------------------------------------- | --------------- |
+| Red Mint Seeds / Red Mint Seed          | Red Mint Leaf   |
+| Blue Mint Seeds / Blue Mint Seed        | Blue Mint Leaf  |
+| Green Mint Seeds / Green Mint Seed      | Green Mint Leaf |
+| Pink Mint Seeds / Pink Mint Seed        | Pink Mint Leaf  |
+| White Mint Seeds / White Mint Seed      | White Mint Leaf |
+| Cyan Mint Seeds / Cyan Mint Seed        | Cyan Mint Leaf  |
 
 ---
 
@@ -187,18 +191,20 @@ Examples:
 
 ---
 
-### Cobblemon Plants → Same Plant
+### Cobblemon Plants & Crops → Same Item
 
-Items in `#cobblemon:plants` can be processed into the same item type, including medicinal leek, herbs, and roots.
+Items in `#cobblemon:plants` and common Cobblemon ingredients can be processed into the same item type, making medicinal materials and herbs easy to farm.
 
-Examples:
-
-| Input          | Output         |
-| -------------- | -------------- |
-| Medicinal Leek | Medicinal Leek |
-| Big Root       | Big Root       |
-| Energy Root    | Energy Root    |
-| Revival Herb   | Revival Herb   |
+| Input                               | Output         |
+| ----------------------------------- | -------------- |
+| Vivichoke Seeds / Vivichoke Seed    | Vivichoke      |
+| Hearty Grains                       | Hearty Grains  |
+| Medicinal Leek                      | Medicinal Leek |
+| Big Root                            | Big Root       |
+| Energy Root                         | Energy Root    |
+| Revival Herb                        | Revival Herb   |
+| Pep-Up Flower                       | Pep-Up Flower  |
+| Galarica Nut                        | Galarica Nut   |
 
 ---
 
